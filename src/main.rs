@@ -3,6 +3,8 @@ fn main() {
     let mut sorted = sort(words, vec![score, bonus, penalty]);
     sorted.reverse();
     println!("Sorted words: {:?}", sorted);
+
+    println!("high score words: {:?}", high_scoreing_words(sorted, score));
 }
 
 fn sort(words: Vec<&str>, functions: Vec<fn(&str) -> isize>) -> Vec<&str> {
@@ -34,4 +36,14 @@ fn penalty(word: &str) -> isize {
         return -7;
     }
     0
+}
+
+fn high_scoreing_words<F>(words: Vec<&str>, function: F) -> Vec<&str>
+where
+    F: Fn(&str) -> isize,
+{
+    words
+        .into_iter()
+        .filter(|&word| function(word) > 1)
+        .collect()
 }
