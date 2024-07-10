@@ -1,10 +1,14 @@
 fn main() {
-    let words = vec!["rust", "java", "typescript", "csharp", "caa", "rustc"];
+    let words = vec!["ada", "haskell", "scala", "java", "rust"];
     let mut sorted = sort(words, vec![score, bonus, penalty]);
     sorted.reverse();
     println!("Sorted words: {:?}", sorted);
 
-    println!("high score words: {:?}", high_scoreing_words(sorted, score));
+    let aggregate = aggregate(vec![score, bonus, penalty]);
+    println!(
+        "high score words: {:?}",
+        high_scoreing_words(sorted, aggregate)
+    );
 }
 
 fn sort(words: Vec<&str>, functions: Vec<fn(&str) -> isize>) -> Vec<&str> {
