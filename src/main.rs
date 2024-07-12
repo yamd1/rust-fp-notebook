@@ -4,11 +4,10 @@ fn main() {
     sorted.reverse();
     println!("Sorted words: {:?}", sorted);
 
-    let aggregate = aggregate(vec![score, bonus, penalty]);
-    println!(
-        "high score words: {:?}",
-        high_scoreing_words(sorted, aggregate)
-    );
+    let aggregate = aggregate(vec![score, bonus, penalty].clone());
+
+    let func = high_scoreing_words(sorted, aggregate);
+    println!("high score words: {:?}", func(1));
 }
 
 fn sort(words: Vec<&str>, functions: Vec<fn(&str) -> isize>) -> Vec<&str> {
@@ -20,8 +19,8 @@ fn sort(words: Vec<&str>, functions: Vec<fn(&str) -> isize>) -> Vec<&str> {
     sorted_words
 }
 
-fn aggregate(functions: Vec<fn(&str) -> isize>) -> impl Fn(&str) -> isize {
-    move |word: &str| -> isize { functions.iter().map(|f| f(word)).sum() }
+fn aggregate<'a>(functions: Vec<fn(&'a str) -> isize>) -> impl Fn(&'a str) -> isize + Clone + 'a {
+    move |word: &'a str| -> isize { functions.iter().map(|f| f(word)).sum() }
 }
 
 fn score(word: &str) -> isize {
@@ -42,12 +41,15 @@ fn penalty(word: &str) -> isize {
     0
 }
 
-fn high_scoreing_words<F>(words: Vec<&str>, function: F) -> Vec<&str>
+fn high_scoreing_words<'a, F>(words: Vec<&'a str>, function: F) -> impl Fn(isize) -> Vec<&'a str>
 where
-    F: Fn(&str) -> isize,
+    F: Fn(&'a str) -> isize + Clone + 'a,
 {
-    words
-        .into_iter()
-        .filter(|&word| function(word) > 1)
-        .collect()
+    move |threshold: isize| -> Vec<&'a str> {
+        words
+            .clone()
+            .into_iter()
+            .filter(|&word| function(word) > threshold)
+            .collect()
+    }
 }
