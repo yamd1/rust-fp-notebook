@@ -1,13 +1,18 @@
 fn main() {
-    let words = vec!["ada", "haskell", "scala", "java", "rust"];
+    let words = vec!["ada", "haskell", "scala", "java", "rust", "aa", "ccc"];
     let mut sorted = sort(words, vec![score, bonus, penalty]);
     sorted.reverse();
     println!("Sorted words: {:?}", sorted);
 
-    let aggregate = aggregate(vec![score, bonus, penalty].clone());
+    let aggregated = aggregate(vec![score, bonus, penalty].clone());
 
-    let func = high_scoreing_words(sorted, aggregate);
+    let func = high_scoreing_words(sorted.clone(), aggregated.clone());
     println!("high score words: {:?}", func(1));
+
+    println!(
+        "score accumulator: {:?}",
+        cumulative_score(sorted.clone(), aggregated.clone())
+    );
 }
 
 fn sort(words: Vec<&str>, functions: Vec<fn(&str) -> isize>) -> Vec<&str> {
@@ -52,4 +57,11 @@ where
             .filter(|&word| function(word) > threshold)
             .collect()
     }
+}
+
+fn cumulative_score<'a, F>(words: Vec<&'a str>, function: F) -> isize
+where
+    F: Fn(&'a str) -> isize,
+{
+    words.iter().fold(0, |acc, e| acc + function(e))
 }
